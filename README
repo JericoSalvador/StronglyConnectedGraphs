@@ -1,0 +1,18 @@
+
+PA4 by Jerico Factor 
+
+List.h
+	Declare functions for List Object
+
+List.c
+	Define functions for List Object
+
+Digraph.h
+	Declare functions for Digraph Object
+
+Digraph.c
+	Define functions for Digraph Objedt
+
+DiagraphProperties.c
+	read an input, create graph, do commands from inputfile, writes to outputfile
+
