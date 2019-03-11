@@ -311,12 +311,12 @@ int insertSorted(List L, int i)
 	Node N = getFront(L); 
 	while(N != NULL)
 	{ 
+		if(i <= N->data)
+			break; 
 		if(i > N->data)
 		{
 			N = getNextNode(N);
 		}
-		if(i <= N->data)
-			break; 
 	}
 	if (N == NULL)
 	{

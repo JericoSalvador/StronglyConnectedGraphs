@@ -15,18 +15,25 @@ void func(int (*f)(int))
 
 int main(void)
 {
-	Digraph G = newDigraph(4); 
+	Digraph G = newDigraph(6); 
 
-	for(int i = 4; i > 1; i--)
-	{
-		addEdge(G, i, i-1); 
-	}
-	addEdge(G,1,2); 
-	// addEdge(G, 1,4); 
-	// printList(stdout, getInNeighbors(G, 2)); printf("\n"); 
-	// deleteEdge(G, 1,2); 
-	// printList(stdout, getInNeighbors(G, 2)); printf("\n"); 
-	// printf("%d\n", 0x7FFFFFFF); 
+	addEdge(G,1,6);
+	fprintf(stdout,"1 worked\n"); 
+	addEdge(G,4,1); 
+	fprintf(stdout,"2 worked\n"); 
+	//addEdge(G,4,3); 
+	fprintf(stdout,"3 worked\n"); 
+	addEdge(G,5,4);
+	fprintf(stdout,"4 worked\n"); 
+	addEdge(G,5,3);
+	fprintf(stdout,"3 worked\n"); 
+	addEdge(G,5,2);
+	addEdge(G,6,5); 
+	addEdge(G,6,4);
+	addEdge(G,2,3);
+	addEdge(G,3,2);  
+
+	printDigraph(stdout, G); fprintf(stdout, "\n"); 
 	printf("%d\n", getCountSCC(G)); 
 	printf("%d\n", getNumSCCVertices(G,4)); 
 	printf("%d\n", inSameSCC(G,2,1)); 
