@@ -17,6 +17,11 @@ typedef struct DigraphObj
 	int order; 
 	int size; 
 
+	int graphChanged; 
+	int numSCC; 
+	int * SCC; 
+
+
 } DigraphObj; 
 
 Digraph newDigraph(int numVertices)
@@ -25,7 +30,8 @@ Digraph newDigraph(int numVertices)
 	G->visitStatus = calloc(sizeof(int),(numVertices + 1)); 
 	G->distance = calloc(sizeof(int), (numVertices + 1)); 
 	G->outEdge = calloc(sizeof(List), (numVertices + 1)); 
-	G->inEdge = malloc(sizeof(List) * (numVertices + 1)); 
+	G->inEdge = malloc(sizeof(List) * (numVertices + 1));
+	G->SCC = malloc(sizeof(int) * (numVertices + 1)); 
 
 	for(int i = 1; i <= numVertices; i++)
 	{
@@ -43,7 +49,7 @@ void freeDigraph(Digraph * pG)
 		return; 
 
 	Digraph G = *pG; 
-	List *ptrL; 
+	List *ptrL;
 
 	for(int i = 1; i <= G->order; i++)
 	{
@@ -52,10 +58,12 @@ void freeDigraph(Digraph * pG)
 		ptrL = G->inEdge + i; 
 		freeList(ptrL); 
 	}
+
 	free(G->distance); 
 	free(G->visitStatus); 
 	free(G->outEdge); 
 	free(G->inEdge);  
+	free(G->SCC);
 
 	free(G); 
 	pG = NULL; 
@@ -119,6 +127,7 @@ int addEdge(Digraph G, int u, int v)
 	insertSorted(uEdges, v); 
 	insertSorted(G->inEdge[v], u); 
 	G-> size ++; 
+	G-> graphChanged = 1; 
 	return 0; 
 }
 
@@ -155,6 +164,8 @@ int deleteEdge(Digraph G, int u, int v)
 		{
 			deleteNum(G->inEdge[v], u); 
 			G->size--; 
+			G->graphChanged = 1; 
+
 			return 0; 
 		} 
 	else 
@@ -380,7 +391,7 @@ int DFSUtil(Digraph G, int u, List stack)
 	return 0; 
 }
 
-void DFSbackwards(Digraph G, int u)
+void DFSbackwards(Digraph G, int u) 
 {
 	setMark(G, u, INPROGRESS); 
 	Node N = getFront(getInNeighbors(G,u)); 
@@ -392,9 +403,10 @@ void DFSbackwards(Digraph G, int u)
 		N = getNextNode(N); 
 	}
 	setMark(G, u, ALLDONE); 
+	G->SCC[u] = G->numSCC; 
 }
 
-int getCountSCC(Digraph G)
+void calcSCC(Digraph G)
 {
 	unvisitAll(G); 
 	List stack = newList();
@@ -406,39 +418,80 @@ int getCountSCC(Digraph G)
 		}
 	}
 	unvisitAll(G); 
-	int counter = 0; 
+	G->numSCC = 0;
 	int curVertex;
 	while(length(stack) != 0) 
 	{
 		curVertex = pop(stack);
 		if(getMark(G, curVertex) == UNVISITED)
 		{
-			counter ++; 
+			G->numSCC ++; 
 			DFSbackwards(G,curVertex); 
 		}
 	}
 	freeList(&stack); 
-	return counter; 
+	G->graphChanged = 0; 
+}
+
+int getCountSCC(Digraph G)
+{
+	if(G->graphChanged)
+		calcSCC(G); 
+	return G->numSCC; 
+	// unvisitAll(G); 
+	// List stack = newList();
+	// for(int i = 1; i <= getOrder(G); i++)
+	// {
+	// 	if(getMark(G, i) == UNVISITED)
+	// 	{
+	// 		DFSUtil(G, i, stack); 
+	// 	}
+	// }
+	// unvisitAll(G); 
+	// int counter = 0; 
+	// int curVertex;
+	// while(length(stack) != 0) 
+	// {
+	// 	curVertex = pop(stack);
+	// 	if(getMark(G, curVertex) == UNVISITED)
+	// 	{
+	// 		counter ++; 
+	// 		DFSbackwards(G,curVertex); 
+	// 	}
+	// }
+	// freeList(&stack); 
+	// return counter; 
 }
 
 int getNumSCCVertices(Digraph G, int u)
 {
 	if(u < 1|| u > getOrder(G))
 		return -1; 
-	unvisitAll(G); 
-	List L = newList(); 
-	DFSUtil(G,u,L); 
+
+	if(G->graphChanged)
+		calcSCC(G); 
+
 	int counter = 0; 
-	unvisitAll(G); 
-	DFSbackwards(G,u); 
 	for(int i = 1; i <= getOrder(G); i++)
 	{
-		if(getMark(G,i) == ALLDONE)
-			if(inList(L, i))
-				counter++; 
+		if (G->SCC[i] == G->SCC[u])
+			counter++; 
 	}
-	freeList(&L); 
-	return counter;
+	return counter; 
+	// unvisitAll(G); 
+	// List L = newList(); 
+	// DFSUtil(G,u,L); 
+	// int counter = 0; 
+	// unvisitAll(G); 
+	// DFSbackwards(G,u); 
+	// for(int i = 1; i <= getOrder(G); i++)
+	// {
+	// 	if(getMark(G,i) == ALLDONE)
+	// 		if(inList(L, i))
+	// 			counter++; 
+	// }
+	// freeList(&L); 
+	// return counter;
 }
 
 int inSameSCC(Digraph G, int u, int v)
@@ -447,21 +500,28 @@ int inSameSCC(Digraph G, int u, int v)
 		return -1;
 	if(u == v)
 		return 1; 
-
-	List L = newList(); 
-	DFSUtil(G,u,L);
-	if(inList(L, v) == 0)
-	{
-		freeList(&L); 
-		return 0; 
-	}
-	unvisitAll(G); 
-	DFSbackwards(G, u); 
-	if(getMark(G, v) == ALLDONE)
-		return 1; 
 	
-	freeList(&L); 
+	if(G->graphChanged)
+		calcSCC(G); 
+
+	if(G->SCC[u] == G->SCC[v])
+		return 1; 
+
 	return 0; 
+	// List L = newList(); 
+	// DFSUtil(G,u,L);
+	// if(inList(L, v) == 0)
+	// {
+	// 	freeList(&L); 
+	// 	return 0; 
+	// }
+	// unvisitAll(G); 
+	// DFSbackwards(G, u); 
+	// if(getMark(G, v) == ALLDONE)
+	// 	return 1; 
+	
+	// freeList(&L); 
+	// return 0; 
 }
 
 

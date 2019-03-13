@@ -11,8 +11,14 @@ Digraph.h
 	Declare functions for Digraph Object
 
 Digraph.c
-	Define functions for Digraph Objedt
+	Define functions for Digraph Object
 
 DiagraphProperties.c
 	read an input, create graph, do commands from inputfile, writes to outputfile
+
+Digraph Struct
+	int [] visitStatus   //used to keep track of visited status for dfs and bfs 
+	List [] outEdge      //contains the outgoing edges for each vertex
+	List [] inEdge       //contains the incoming edges for each vertex.
+	int [] distance      //contains distance relative to a certain vertex, not needed for pa4 
 

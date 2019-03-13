@@ -1,5 +1,5 @@
 // Jerico Factor
-// PA 3 
+// PA 4 
 // ID: 1674120 
 
 // DigraphProperties.c
@@ -272,7 +272,10 @@ int main(int argc, char * argv[])
                     fprintf(fout, "ERROR\n");
                     break;  
                 }
-                fprintf(fout,"%d\n",inSameSCC(G, arr[0], arr[1])); 
+                if(inSameSCC(G, arr[0], arr[1]))
+                    fprintf(fout, "YES\n");
+                else
+                    fprintf(fout, "NO\n");
                 break; 
             }
 

@@ -39,5 +39,15 @@ int main(void)
 	printf("%d\n", inSameSCC(G,2,1)); 
 	freeDigraph(&G); 
 	// func(fun); 
+
+	printf("\n\n"); 
+	int x = -1; 
+	if(x)
+		printf("true");
+	else
+	{
+		printf("false"); 
+	}
+	
 	
 }
