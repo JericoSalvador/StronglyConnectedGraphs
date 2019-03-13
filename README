@@ -21,4 +21,6 @@ Digraph Struct
 	List [] outEdge      //contains the outgoing edges for each vertex
 	List [] inEdge       //contains the incoming edges for each vertex.
 	int [] distance      //contains distance relative to a certain vertex, not needed for pa4 
-
+	int numSCC           //contains the number of SCC in graph
+	int [] SCC           //contains which SCC vertex is in
+	int graphChanged     //if graph has changed since checking for SCC
