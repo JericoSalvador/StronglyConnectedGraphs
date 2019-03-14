@@ -2,14 +2,12 @@
 import os
 
 
-os.system("make clean"); 
-os.system("make")
+if __name__ == "__main__":  
 
-letters = ['a','b','c','d']#,'e','f']
-for letter in letters: 
+	letters = ['a','b','c','d']#,'e','f']
+	for letter in letters: 
 
-	os.system("valgrind --leak-check=full --track-origins=yes ./DigraphProperties public/input_" + letter + ".txt public/output_" + letter)
-	print("working on:", letter)
-	# input("press enter to continue...")
-
-os.system("make clean")
+		command = os.path.join(os.getcwd(), "DigraphProperties ") + os.path.join("public", "input_") + letter + ".txt " + os.path.join("public", "output_" + letter);
+		os.system("valgrind --leak-check=full --track-origins=yes " + command); 	
+		print("working on:", letter)
+		os.system("make clean")
